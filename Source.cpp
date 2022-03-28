@@ -149,6 +149,8 @@ int main()
         parametr->hCannotWorkEvent = cannotContinueWorkEvent;
         parametr->hContinueEvent = continueWorkEvent;
         parametr->hEndWorkEvent = endWorkEvent;
+
+        EnterCriticalSection(&cs);
         
         markers[i] = CreateThread(
             NULL,                   // default security attributes
@@ -157,6 +159,12 @@ int main()
             (Params*)parametr,          // argument to thread function 
             0,                      // use default creation flags 
             NULL);   // returns the thread identifier 
+        if (NULL == markers[i]) 
+        {
+            std::cout << "Invalid handle. Failed to create thread";
+            return -1;
+        }
+        LeaveCriticalSection(&cs);
     }
 
     //track alive threads
@@ -235,6 +243,11 @@ int main()
             CloseHandle(handlesCannotContinue[i]);
         }
     }
+
+    delete[] markers;
+    delete[] handlesEndWork;
+    delete[] array;
+    delete[] isAlive;
 
     return 0;
 }
